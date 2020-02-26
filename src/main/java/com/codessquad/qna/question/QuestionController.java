@@ -1,5 +1,7 @@
 package com.codessquad.qna.question;
 
+import com.codessquad.qna.errors.ForbiddenException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,34 +9,38 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Controller
+@RequestMapping("/questions")
 public class QuestionController {
 
-  List<Question> questionList = new ArrayList<>();
+  @Autowired
+  private QuestionRepository questionRepository;
 
-  @GetMapping("/qna/form")
-  public String goForm(Model model) {
-    return "/qna/form";
+  /**
+   * Question 작성을 위한 form 으로 이동합니다.
+   */
+  @GetMapping("/form")
+  public String form(Model model) {
+    return "/questions/form";
   }
 
-  @PostMapping("/question")
-  public String createQuestion(Question question) {
-    questionList.add(question);
-    return "redirect:/index";
+  /**
+   * Question 추가 후 welcome 페이지로 이동합니다.
+   */
+  @PostMapping("")
+  public String create(Question question) {
+    questionRepository.save(question);
+
+    return "redirect:/welcome";
   }
 
-  @GetMapping(value = {"/", "/index"})
-  public String goIndex(Model model) {
-    model.addAttribute("questions", questionList);
-    return "/index";
-  }
+  /**
+   * Question 의 상세 내용을 보여주는 show 페이지로 이동합니다.
+   */
+  @GetMapping("/{id}")
+  public String show(@PathVariable long id, Model model) {
+    model.addAttribute("question", questionRepository.findById(id).orElseThrow(ForbiddenException::new));
 
-  @GetMapping("/questions/{index}")
-  public String goPage(@PathVariable int index, Model model) {
-    model.addAttribute("question", questionList.get(index - 1));
-    return "/qna/show";
+    return "/questions/show";
   }
 }

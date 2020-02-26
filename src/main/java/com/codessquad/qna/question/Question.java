@@ -1,32 +1,38 @@
 package com.codessquad.qna.question;
 
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Entity;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Entity
 public class Question {
 
-  private static int SEQ_NUM = 0;
+  private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm");
 
-  private int index;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
+
+  @Column(nullable = false, length = 20)
   private String writer;
   private String title;
   private String contents;
-  private String dateTime;
+  private LocalDateTime dateTime;
 
-  public Question(LocalDateTime dateTime) {
-    LocalDateTime localDateTime = LocalDateTime.now();
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm");
-    this.dateTime = localDateTime.format(dateTimeFormatter);
-    index = ++SEQ_NUM;
+  public Question() {
+    this.dateTime = LocalDateTime.now();
   }
 
-
-  public int getIndex() {
-    return index;
+  public long getId() {
+    return id;
   }
 
-  public void setIndex(int index) {
-    this.index = index;
+  public void setId(long index) {
+    this.id = index;
   }
 
   public String getWriter() {
@@ -54,10 +60,10 @@ public class Question {
   }
 
   public String getDateTime() {
-    return dateTime;
+    return dateTime.format(dateTimeFormatter);
   }
 
-  public void setDateTime(String dateTime) {
+  public void setDateTime(LocalDateTime dateTime) {
     this.dateTime = dateTime;
   }
 }
